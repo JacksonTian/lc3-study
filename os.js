@@ -80,9 +80,7 @@ class OS {
         }
 
         while (this.running) {
-            console.log(`PC 0x${this.registers[R_PC].toString(16)}`);
             const instr = this.memory[this.registers[R_PC]];
-            console.log(`INSTRUCTION: 0x${instr.toString(16)}`);
             this.registers[R_PC]++;
             const op = instr >> 12;
             switch (op) {
@@ -123,8 +121,6 @@ class OS {
                             {
                                 /* one char per word */
                                 let offset = this.registers[R_R0];
-                                console.log(`0x${offset.toString(16)}`);
-                                console.log(this.memory.subarray(offset, offset + 20));
                                 let c = this.memory[offset];
                                 while (c) {
                                     process.stdout.write(String.fromCharCode(c));
@@ -161,9 +157,8 @@ class OS {
                         //     }
                         //     break;
                         case TRAP_HALT:
-                            // /* TRAP HALT */
-                            // puts("HALT");
-                            // fflush(stdout);
+                            /* TRAP HALT */
+                            console.log("HALT");
                             this.running = false;
                             break;
                         default:
