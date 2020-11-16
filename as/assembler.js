@@ -1,21 +1,26 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const Lexer = require('./lib/lexer');
-const Parser = require('./lib/parser');
+const Lexer = require('./lexer');
+const Parser = require('./parser');
 
-const argv = process.argv.slice(2);
-
-if (argv.length < 1) {
-    console.log("lc3as [source] ...");
-    process.exit(2);
-}
-
-const filename = path.resolve(argv[0]);
-const lexer = new Lexer(fs.readFileSync(filename, 'utf8'), filename);
-const parser = new Parser(lexer);
-const ast = parser.program();
+const hex = {
+    '0': 0,
+    '1': 1,
+    '2': 2,
+    '3': 3,
+    '4': 4,
+    '5': 5,
+    '6': 6,
+    '7': 7,
+    '8': 8,
+    '9': 9,
+    'A': 10,
+    'B': 11,
+    'C': 12,
+    'D': 13,
+    'E': 14,
+    'F': 15,
+};
 
 function traverse(ast) {
     const addresses = new Map();
@@ -42,27 +47,7 @@ function traverse(ast) {
             throw new Error();
         }
     }
-    console.log(addresses);
     return addresses;
-}
-
-const hex = {
-    '0': 0,
-    '1': 1,
-    '2': 2,
-    '3': 3,
-    '4': 4,
-    '5': 5,
-    '6': 6,
-    '7': 7,
-    '8': 8,
-    '9': 9,
-    'A': 10,
-    'B': 11,
-    'C': 12,
-    'D': 13,
-    'E': 14,
-    'F': 15,
 }
 
 function parseHex(value) {
@@ -129,9 +114,12 @@ const NZP = {
     'BRnzp': 0b111
 };
 
-class Emitter {
-    constructor() {
+class Assembler {
+    constructor(source, filename) {
         this.instructions = [];
+        this.addresses = new Map();
+        this.source = source;
+        this.filename = filename;
     }
 
     emit(value) {
@@ -139,15 +127,11 @@ class Emitter {
         buff.writeUInt16BE(value);
         this.instructions.push(buff);
     }
-}
-
-class Visitor extends Emitter {
-    constructor(addresses) {
-        super();
-        this.addresses = addresses;
-    }
 
     visit(ast) {
+        // step 1
+        this.addresses = traverse(ast);
+        // step 2
         for (let i = 0; i < ast.length; i++) {
             const item = ast[i];
             if (item.type === 'label') {
@@ -159,17 +143,6 @@ class Visitor extends Emitter {
             } else {
                 console.log(item);
                 throw new Error();
-            }
-        }
-    }
-
-    visitBlock(ast) {
-        for (let i = 0; i < ast.instructions.length; i++) {
-            const item = ast.instructions[i];
-            if (item.type === 'instruction') {
-                this.visitInstruction(item);
-            } else if (item.type === 'pseudo_op') {
-                this.visitPseudoOp(item);
             }
         }
     }
@@ -276,9 +249,13 @@ class Visitor extends Emitter {
                 break;
         }
     }
+
+    codegen() {
+        const lexer = new Lexer(this.source, this.filename);
+        const parser = new Parser(lexer);
+        this.visit(parser.program());
+        return Buffer.concat(this.instructions);
+    }
 }
 
-const visitor = new Visitor(traverse(ast));
-visitor.visit(ast);
-const machineCodes = Buffer.concat(visitor.instructions);
-fs.writeFileSync(path.basename(filename, '.asm') + '.obj', machineCodes);
+module.exports = Assembler;
