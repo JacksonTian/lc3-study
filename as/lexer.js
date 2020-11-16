@@ -43,6 +43,7 @@ class Lexer {
         this.reserve('LDI', Tag.OP);
         this.reserve('LEA', Tag.OP);
         this.reserve('STI', Tag.OP);
+        this.reserve('JMPT', Tag.OP);
         this.reserve('RET', Tag.OP);
         this.reserve('ST', Tag.OP);
         this.reserve('STR', Tag.OP);
@@ -262,6 +263,19 @@ class Lexer {
 
             return new Token(Tag.LABEL, str, {
                 start: start,
+                end: this.loc()
+            });
+        }
+
+        if (isNumeric(this.peek)) {
+            let str = this.peek;
+            this.getch();
+            while (isNumeric(this.peek)) {
+                str += this.peek;
+                this.getch();
+            }
+            return new Token(Tag.NUMBER, str, {
+                start,
                 end: this.loc()
             });
         }

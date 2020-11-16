@@ -261,6 +261,7 @@ class OS {
                     break;
                 default:
                     console.log('un-supported');
+                    console.log(instr.toString(2));
                     process.exit(-1);
                     break;
             }

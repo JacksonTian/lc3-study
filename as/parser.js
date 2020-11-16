@@ -214,6 +214,14 @@ class Parser {
                 op: op,
                 label: label
             };
+        } else if (op.lexeme === 'JMPT') {
+            const br = this.look;
+            this.match(Tag.REGISTER);
+            return {
+                type: 'instruction',
+                op: op,
+                br: br
+            };
         } else {
             this.error('un-support');
         }
@@ -252,6 +260,16 @@ class Parser {
                         data: token
                     }
                 }
+            } else if (token.tag === Tag.DEC) {
+                this.move();
+                return {
+                    type: 'pseudo_op',
+                    name: 'fill',
+                    value: {
+                        type: 'value',
+                        data: token
+                    }
+                }
             } else {
                 this.error('un-supported');
             }
@@ -267,6 +285,14 @@ class Parser {
             return {
                 type: 'pseudo_op',
                 name: 'end',
+            };
+        } else if (token.lexeme === '.BLKW') {
+            const count = this.look;
+            this.match(Tag.NUMBER);
+            return {
+                type: 'pseudo_op',
+                name: 'blkw',
+                count: count
             };
         } else {
             this.error('un-supported');

@@ -9,6 +9,7 @@ const Tag = Object.freeze({
     REGISTER: 6,    // register
     DEC: 7,          // decimal
     STRING: 8,      // string
+    NUMBER: 9,      // number
 });
 
 module.exports = Tag;

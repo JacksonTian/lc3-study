@@ -37,6 +37,8 @@ function traverse(ast) {
                 // index = index + 1;
             } else if (item.name === 'stringz') {
                 index = index + (item.value.lexeme.length + 1);
+            } else if (item.name === 'blkw') {
+                index = index + parseInt(item.count.lexeme, 10);
             } else if (item.name === 'end') {
                 // noop
             }
@@ -167,6 +169,11 @@ class Assembler {
                 this.emit(code);
             }
             this.emit(0);
+        } else if (ast.name === 'blkw') {
+            const count = parseInt(ast.count.lexeme, 10);
+            for (let i = 0; i < count; i++) {
+                this.emit(0);
+            }
         } else if (ast.name === 'end') {
             // do nothing
         } else {
@@ -242,6 +249,11 @@ class Assembler {
                 break;
             case 'NOT':
                 this.emit(opcode + (REGISTERS[ast.dr.lexeme] << 9) + (REGISTERS[ast.sr.lexeme] << 6) + 0b111111);
+                break;
+            case 'JMPT': {
+                const opcode = INSTRUCTIONS['JMP'];
+                this.emit(opcode + (REGISTERS[ast.br.lexeme] << 6) + 1);
+            }
                 break;
             default:
                 console.log(ast);
