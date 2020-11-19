@@ -1,0 +1,4 @@
+.ORIG x3000
+ADD R1, R0, R1
+LDR R2, R3, 0
+.END

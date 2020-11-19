@@ -41,6 +41,9 @@ function traverse(ast) {
                 index = index + parseInt(item.count.lexeme, 10);
             } else if (item.name === 'end') {
                 // noop
+            } else {
+                console.log(item);
+                throw new Error();
             }
         } else if (item.type === 'instruction') {
             index = index + 1;
@@ -49,6 +52,7 @@ function traverse(ast) {
             throw new Error();
         }
     }
+    console.log(addresses);
     return addresses;
 }
 
@@ -254,6 +258,8 @@ class Assembler {
                 const opcode = INSTRUCTIONS['JMP'];
                 this.emit(opcode + (REGISTERS[ast.br.lexeme] << 6) + 1);
             }
+            case 'RTI':
+                this.emit(0b1000000000000000);
                 break;
             default:
                 console.log(ast);

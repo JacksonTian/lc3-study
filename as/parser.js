@@ -222,6 +222,11 @@ class Parser {
                 op: op,
                 br: br
             };
+        } else if (op.lexeme === 'RTI') {
+            return {
+                type: 'instruction',
+                op: op
+            };
         } else {
             this.error('un-support');
         }

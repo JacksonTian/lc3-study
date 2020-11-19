@@ -45,6 +45,7 @@ class Lexer {
         this.reserve('STI', Tag.OP);
         this.reserve('JMPT', Tag.OP);
         this.reserve('RET', Tag.OP);
+        this.reserve('RTI', Tag.OP);
         this.reserve('ST', Tag.OP);
         this.reserve('STR', Tag.OP);
         this.reserve('ADD', Tag.OP);
@@ -58,6 +59,7 @@ class Lexer {
         this.reserve('BRzp', Tag.OP);
         this.reserve('BRnzp', Tag.OP);
         this.reserve('JSR', Tag.OP);
+        this.reserve('JSRR', Tag.OP);
 
         // Trap Service Routine
         this.reserve('GETC', Tag.OP);
